@@ -16,6 +16,13 @@ Outline:
  
  Note: scripts do not run with python3, only pyhton and python 2
  
+ https://makersportal.com/blog/2018/8/23/recording-audio-on-the-raspberry-pi-with-python-and-a-usb-microphone
+ - check the usb is connected
+ - setting up pyauddio
+ 
+ https://people.csail.mit.edu/hubert/pyaudio/docs/
+ - the pyaudio documentation containing the original examle code
+ 
  Common Issues/Solutions:
- - updating the system using "sudo apt-get update"
+ - updating the system using "sudo apt-get update" or "sudo rpi-update"
  - IOError: [Errno -9996] Invalid input device means the audio device is not physically connected properly 
