@@ -42,5 +42,5 @@ Notes:
  - updating the system using "sudo apt-get update" or "sudo rpi-update"
  - IOError: [Errno -9996] Invalid input device means the audio device is not physically connected properly 
  - Input overflow error addressed in comments of 'usb-audio-input.py' 
- 
+ - Invalid number of channels is and easy fix: check the number of channels of the device and update the variable in the code accordingly, more at https://www.raspberrypi.org/forums/viewtopic.php?t=71062
  
