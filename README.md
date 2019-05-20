@@ -23,6 +23,12 @@ Outline:
  https://people.csail.mit.edu/hubert/pyaudio/docs/
  - the pyaudio documentation containing the original examle code
  
+ https://www.raspberrypi.org/forums/viewtopic.php?t=25173
+ - another helpful link for setting up pyaudio aand streaming data
+ 
+ 5. checking the audio that was recorded
+ - because my usb audio did not have output, I used the headphone jack and forced the audio to be player thru it using "omxplayer"
+ 
  Common Issues/Solutions:
  - updating the system using "sudo apt-get update" or "sudo rpi-update"
  - IOError: [Errno -9996] Invalid input device means the audio device is not physically connected properly 
