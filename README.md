@@ -31,7 +31,7 @@ Notes:
     - usb-audio-input.py requires numpy, pyaudio, analyse
  
  5. Checking the audio that was recorded
-    - because my usb audio did not have output, I used the headphone jack and forced the audio to be player thru it using "omxplayer"
+    - because my usb audio did not have output, I used the headphone jack and forced the audio to be player thru it using "omxplayer -local xxx.mp3"
 
  
  More Information:
