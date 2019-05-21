@@ -16,6 +16,7 @@ Notes:
 3. Checking the status of the devices
     - "cat /proc/asound/modules" should display 0 snd_usb_audio is what we are looking for, it will display as (index)(name of device)
     - if configurations edited correctly running "alsamixer", hitting the F6 sound card key will display as option 0
+    - if the device index can not be changed, edit the program variables to match index of audio input device
 4. Running the scripts requires a few more libraries and installs
     https://www.raspberrypi.org/forums/viewtopic.php?t=25173
     - another helpful link for setting up pyaudio aand streaming data
