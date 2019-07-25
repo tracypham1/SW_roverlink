@@ -31,7 +31,9 @@
  #include <SdFat.h>
  extern SdFat SD;
 #else
- #include <SD.h>
+  #include <SD.h>
+  //#include <SdFat.h>
+  //extern SdFat SD;
 #endif
 
 // define here the size of a register!

@@ -1,28 +1,13 @@
-/*************************************************** 
-  This is an example for the Adafruit VS1053 Codec Breakout
+//plays .mp3 file and .ogg file, tested with 
 
-  Designed specifically to work with the Adafruit VS1053 Codec Breakout 
-  ----> https://www.adafruit.com/products/1381
-
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
-  BSD license, all text above must be included in any redistribution
- ****************************************************/
+//as of 7/24 realized called startplayinfile() and playfullfile(), no idea how each works... 
+//but they both do for both '.ogg' and '.mp3'
+//although, sending 's' to the console only stops playfullfile() calls
 
 // include SPI, MP3 and SD libraries
 #include <SPI.h>
 #include <Adafruit_VS1053.h>
 #include <SD.h>
-
-// define the pins used
-//#define CLK 13       // SPI Clock, shared with SD card
-//#define MISO 12      // Input data, from VS1053/SD card
-//#define MOSI 11      // Output data, to VS1053/SD card
-// Connect CLK, MISO and MOSI to hardware SPI pins. 
-// See http://arduino.cc/en/Reference/SPI "Connections"
 
 // These are the pins used for the breakout example
 #define BREAKOUT_RESET  9      // VS1053 reset pin (output)
@@ -41,8 +26,6 @@
 Adafruit_VS1053_FilePlayer musicPlayer = 
   // create breakout-example object!
   Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
-  // create shield-example object!
-  //Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
   
 void setup() {
   Serial.begin(9600);
@@ -65,19 +48,23 @@ void setup() {
   // Set volume for left, right channels. lower numbers == louder volume!
   musicPlayer.setVolume(20,20);
 
-  // Timer interrupts are not suggested, better to use DREQ interrupt!
-  //musicPlayer.useInterrupt(VS1053_FILEPLAYER_TIMER0_INT); // timer int
-
   // If DREQ is on an interrupt pin (on uno, #2 or #3) we can do background
   // audio playing
   musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
 
+  musicPlayer.sineTest(0x44, 500);
+
+  //trying to play two files on top of each other causes an error...
+
   // Play one file, don't return until complete
   Serial.println(F("Playing track 001"));
-  musicPlayer.playFullFile("/roar.ogg");
-  // Play another file in the background, REQUIRES interrupts!
-  Serial.println(F("Playing track 002"));
   musicPlayer.startPlayingFile("/secret.mp3");
+  //musicPlayer.playFullFile("/secret.mp3"); 
+
+  // Play another file in the background, REQUIRES interrupts!
+  //Serial.println(F("Playing track 002"));
+
+
 }
 
 void loop() {

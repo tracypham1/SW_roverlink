@@ -1,3 +1,7 @@
+//Sends a tone to the registers, no SD card needed
+//mainly tested here to check pin connections
+//Adafruit_VS1053_FilePlayer::sineTest() called in other sketches to indicated beginning of recording, etc.
+
 // include SPI, MP3 and SD libraries
 #include <SPI.h>
 #include <Adafruit_VS1053.h>
@@ -33,10 +37,7 @@ void setup() {
 
   pinMode(CARDCS, OUTPUT);
   digitalWrite(CARDCS, HIGH);
-
-  //uint8_t v  = Adafruit_VS1053::begin(); 
-  //inside Adafruit_VS1053 'low level' interface
-  //device obj stuff == musicPlayer.begin();
+  
   Adafruit_VS1053 device(MOSI, MISO, CLK, BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ);
 
   if(device._reset == 9){

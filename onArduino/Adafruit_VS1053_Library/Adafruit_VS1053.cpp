@@ -13,6 +13,10 @@
  ****************************************************/
 
 #include <Adafruit_VS1053.h>
+#include <SD.h>
+//#include <SDFat.h>
+//extern SdFat SD;
+
 
 #if defined(ARDUINO_STM32_FEATHER)
    #define digitalPinToInterrupt(x) x
@@ -131,6 +135,14 @@ boolean Adafruit_VS1053_FilePlayer::begin(void) {
 
 
 boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
+  //i wanna see this print stuff
+
+  if(startPlayingFile(trackname))
+    Serial.println("playFullFile(): and we're off...");
+  else
+    return false;
+  
+  
   if (! startPlayingFile(trackname)){ //embedded feedBuffer_noLock is playing the byterate read
     return false;
   }
@@ -139,17 +151,16 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
     Serial.println("start up buffer OK");
   }
   
-
-  while (playingMusic) {
+  Serial.println("playFullFile(): twiddle thumbs"); //mp3 doesnt go here?
     // twiddle thumbs
     feedBuffer(); 
     delay(5);           // give IRQs a chance
-  }
+
   // music file finished!
   return true;
 }
 
-void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
+void Adafruit_VS1053_FilePlayer::stopPlaying(void) { //doesn't work for .ogg
   // cancel all playback
   sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW | VS1053_MODE_SM_CANCEL);
   
@@ -227,46 +238,50 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_WRAMADDR, 0x1e29);
   sciWrite(VS1053_REG_WRAM, 0);
 
-  Serial.print("trackname here: ");
+  Serial.print("startPlayingFile(): trackname here - ");
   Serial.println(trackname);
   currentTrack = SD.open(trackname);
   if (!currentTrack) {
-    Serial.println("track failed to open here");
+    Serial.println("startPlayingFile(): track failed to open here");
     return false;
   }
   else
   {
-    Serial.println("buffer filled OK");
+    Serial.println("startPlayingFile(): track on SD opened OK");
   }
+ 
   
-    
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
-  if (isMP3File(trackname)) {
+  if (isMP3File(trackname))  {
     boolean check = currentTrack.seek(mp3_ID3Jumper(currentTrack));
     if(check)
-      Serial.println("isMP3File check OK");
+      Serial.println("startPlayingFile(): isMP3File check OK");
   }
-
+  else
+  {
+      Serial.println("startPlayingFile(): not .mp3 file OK");
+  }
+  
   // don't let the IRQ get triggered by accident here
   noInterrupts();
-
   // As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0
   sciWrite(VS1053_REG_DECODETIME, 0x00);
   sciWrite(VS1053_REG_DECODETIME, 0x00);
 
-  playingMusic = true;
+  playingMusic = true; //why does music play even is feedBuffer() isnt being called.. i think its bc play back sciWrite is doing this
+  //playingMusic = false; //this controls being played
 
   // wait till its ready for data
   while (! readyForData() ) {
-#if defined(ESP8266)
-	yield();
-#endif
+  #if defined(ESP8266)
+	  yield();
+  #endif
   }
 
-  // fill it up!
+  //fill it up!
   while (playingMusic && readyForData()) {
-    feedBuffer(); //bits get read and data gets played, aka written to register
+    feedBuffer();
   }
 
   // ok going forward, we can use the IRQ
@@ -275,6 +290,8 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   return true;
 }
 
+//each byte of audio file is being read and written here i think...
+
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   noInterrupts();
   // dont run twice in case interrupts collided
@@ -282,22 +299,16 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   // an interrupt occurs before feedBufferLock is reset to false. This
   // may cause a glitch in the audio but at least it will not corrupt
   // state.
- Serial.println("FUCK1");
-  //feedBufferLcok is false here
+
   if (feedBufferLock) {
-     Serial.println("FUCK2");
     interrupts();
-     Serial.println("FUCK3");
     return;
   }
 
-   Serial.println("FUCK4");
   feedBufferLock = true;
-  Serial.println("FUCK5");
   interrupts();
-  Serial.println("FUCK6");
 
-  feedBuffer_noLock(); //playData is called
+  feedBuffer_noLock();
   feedBufferLock = false;
 
 }
@@ -318,12 +329,12 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
       currentTrack.close();
-      Serial.println("close bit");
+      Serial.println("feedBuffer_noLock(): close bit");
       break;
     }
 
     playData(mp3buffer, bytesread);
-    Serial.println("play bit");
+    //Serial.println("feedBuffer_noLock(): play bit");
   }
 }
 
